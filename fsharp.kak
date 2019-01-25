@@ -16,14 +16,16 @@ add-highlighter shared/fsharp/code default-region group
 add-highlighter shared/fsharp/docstring     region (\(\*) (\*\)) regions
 add-highlighter shared/fsharp/double_string region '"'   (?<!\\)(\\\\)*"  fill string
 add-highlighter shared/fsharp/comment       region '//'   '$'              fill comment
+# https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/attributes 
+add-highlighter shared/fsharp/attributes region "\[<"   ">\]"  fill meta
 
 add-highlighter shared/fsharp/docstring/ default-region fill string
+# ability to write highlighted code inside docstring:
 add-highlighter shared/fsharp/docstring/ region '>>> \K'    '\z' ref fsharp
 add-highlighter shared/fsharp/docstring/ region '\.\.\. \K'    '\z' ref fsharp
 
 evaluate-commands %sh{
     # Grammar
-    values="true|false"
     meta="open"
 
 	  # exceptions taken from fsharp.vim colors
@@ -39,7 +41,7 @@ evaluate-commands %sh{
     keywords="${keywords}|async|atomic|break|checked|component|const|constraint"
     keywords="${keywords}|constructor|continue|decimal|eager|event|external"
     keywords="${keywords}|fixed|functor|include|method|mixin|object|parallel"
-    keywords="${keywords}|process|pure|return|seq|tailcall|trait"
+    keywords="${keywords}|process|pure|return|seq|tailcall|trait|yield"
     # additional operator keywords (Microsoft.FSharp.Core.Operators)
     keywords="${keywords}|box|hash|sizeof|typeof|typedefof|unbox|ref|fst|snd"
     keywords="${keywords}|stdin|stdout|stderr"
@@ -62,7 +64,6 @@ evaluate-commands %sh{
 
     # Highlight keywords
     printf %s "
-        add-highlighter shared/fsharp/code/ regex '\b(${values})\b' 0:value
         add-highlighter shared/fsharp/code/ regex '\b(${meta})\b' 0:meta
         add-highlighter shared/fsharp/code/ regex '\b(${exceptions})\b' 0:function
         add-highlighter shared/fsharp/code/ regex '\b(${fsharpCoreMethod})\b' 0:function
@@ -70,12 +71,15 @@ evaluate-commands %sh{
     "
 }
 
+# values
+add-highlighter shared/fsharp/code/ regex "\b(true|false)\b" 0:value
+add-highlighter shared/fsharp/code/ regex "\B(\(\))\B" 0:value
 # accomodate typically overloaded operators
 add-highlighter shared/fsharp/code/ regex "\B(<<>>|<\|\|>)\B" 0:operator
 # fsharp operators
 add-highlighter shared/fsharp/code/ regex "\B(->|<-|<=|>=)\B" 0:operator
 add-highlighter shared/fsharp/code/ regex "\b(not)\b" 0:operator
-add-highlighter shared/fsharp/code/ regex (?<=[\w\s\d'"_])(::|(\|)+|@|\|>|<\||\.\.|<=|>=|<>|(<)+|(>)+|!=|==|(\^)+|(&)+|\+|-|(\*)+|//|/|%|~) 0:operator
+add-highlighter shared/fsharp/code/ regex (?<=[\w\s\d'"_])(::|\h\|\h|(\|\|)+|@|\|>|<\||\.\.|<=|>=|<>|(<)+|(>)+|!=|==|(\^)+|(&)+|\+|-|(\*)+|//|/|%|~) 0:operator
 add-highlighter shared/fsharp/code/ regex (?<=[\w\s\d'"_])((?<![=<>!])=(?![=])|[+*-]=) 0:builtin
 
 # Initialization
