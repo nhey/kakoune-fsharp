@@ -28,7 +28,7 @@ evaluate-commands %sh{
     # Grammar
     meta="open"
 
-	  # exceptions taken from fsharp.vim colors
+    # exceptions taken from fsharp.vim colors
     exceptions="try|failwith|failwithf|finally|invalid_arg|raise|rethrow"
 
     # keywords taken from fsharp.vim colors
@@ -71,6 +71,8 @@ evaluate-commands %sh{
     "
 }
 
+# brackets
+add-highlighter shared/fsharp/code/ regex "[\[\]\(\){}]" 0:bracket
 # values
 add-highlighter shared/fsharp/code/ regex "\b(true|false)\b" 0:value
 add-highlighter shared/fsharp/code/ regex "\B(\(\))\B" 0:value
