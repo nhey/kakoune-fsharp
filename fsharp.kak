@@ -84,6 +84,24 @@ add-highlighter shared/fsharp/code/ regex "\b(not)\b" 0:operator
 add-highlighter shared/fsharp/code/ regex (?<=[\w\s\d'"_])(::|\h\|\h|(\|\|)+|@|\|>|<\||\.\.|<=|>=|<>|(<)+|(>)+|!=|==|(\^)+|(&)+|\+|-|(\*)+|//|/|%|~) 0:operator
 add-highlighter shared/fsharp/code/ regex (?<=[\w\s\d'"_])((?<![=<>!])=(?![=])|[+*-]=) 0:builtin
 
+# Commands
+# ‾‾‾‾‾‾‾‾
+
+define-command -hidden fsharp-indent-on-new-line %{
+    evaluate-commands -draft -itersel %{
+        # copy '//' comment prefix and following white spaces
+        try %{ execute-keys -draft k <a-x> s ^\h*//\h* <ret> y jgh P }
+        # preserve previous line indent
+        try %{ execute-keys -draft \; K <a-&> }
+        # cleanup trailing whitespaces from previous line
+        try %{ execute-keys -draft k <a-x> s \h+$ <ret> d }
+        # indent after line ending with =
+        try %{ execute-keys -draft <space> k <a-x> <a-k> =$ <ret> j <a-gt> }
+        # indent after line ending with "do"
+        try %{ execute-keys -draft <space> k <a-x> <a-k> do$ <ret> j <a-gt> }
+    }
+}
+
 # Initialization
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 
