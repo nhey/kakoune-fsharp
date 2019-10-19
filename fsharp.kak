@@ -1,4 +1,4 @@
-# fsharp
+# https://fsharp.org/
 #
 
 # Detection
@@ -7,6 +7,27 @@
 hook global BufCreate .*[.](fs|fsx|fsi) %{
     set-option buffer filetype fsharp
 }
+
+# Initialization
+# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+
+hook global WinSetOption filetype=fsharp %{
+    require-module fsharp
+
+    # cleanup trailing whitespaces upon exiting insert mode
+    hook window ModeChange insert:.* -group fsharp-trim-indent %{ try %{ execute-keys -draft \; <a-x> s ^\h+$ <ret> d } }
+    # indent on newline
+    hook window InsertChar \n -group fsharp-indent fsharp-indent-on-new-line
+
+    hook -once -always window WinSetOption filetype=.* %{ remove-hooks window fsharp-.+ }
+}
+
+hook -group fsharp-highlight global WinSetOption filetype=fsharp %{
+    add-highlighter window/fsharp ref fsharp
+    hook -once -always window WinSetOption filetype=.* %{ remove-highlighter window/fsharp }
+}
+
+provide-module fsharp %§
 
 # Highlighters & Completion
 # ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -28,10 +49,10 @@ evaluate-commands %sh{
     # Grammar
     meta="open"
 
-    # exceptions taken from fsharp.vim colors
+    # exceptions taken from fsharp.vim colors (https://github.com/fsharp/vim-fsharp)
     exceptions="try|failwith|failwithf|finally|invalid_arg|raise|rethrow"
 
-    # keywords taken from fsharp.vim colors
+    # keywords taken from fsharp.vim colors (https://github.com/fsharp/vim-fsharp)
     keywords="abstract|as|assert|base|begin|class|default|delegate"
     keywords="${keywords}|do|done|downcast|downto|elif|else|end|exception"
     keywords="${keywords}|extern|for|fun|function|global|if|in|inherit|inline"
@@ -102,17 +123,4 @@ define-command -hidden fsharp-indent-on-new-line %{
     }
 }
 
-# Initialization
-# ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-
-hook -group fsharp-highlight global WinSetOption filetype=fsharp %{
-    add-highlighter window/fsharp ref fsharp
-    hook -once -always window WinSetOption filetype=.* %{ remove-highlighter window/fsharp }
-}
-
-hook global WinSetOption filetype=fsharp %{
-    hook window InsertChar \n -group fsharp-indent fsharp-indent-on-new-line
-    # cleanup trailing whitespaces on current line insert end
-    hook window ModeChange insert:.* -group fsharp-trim-indent %{ try %{ execute-keys -draft \; <a-x> s ^\h+$ <ret> d } }
-    hook -once -always window WinSetOption filetype=.* %{ remove-hooks window fsharp-.+ }
-}
+§
